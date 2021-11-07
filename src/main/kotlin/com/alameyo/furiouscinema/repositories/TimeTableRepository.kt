@@ -30,10 +30,11 @@ class TimeTableRepository(@Autowired private val database: MongoDatabase) {
         list.forEach {
             val bsonTimeSlot = Document().apply {
                 it as JsonObject
-                append("room", (it).get("room").asString)
-                append("movieId", (it).get("movieId").asString)
-                append("startHour", (it).get("startHour").asString)
-                append("endHour", (it).get("endHour").asString)
+                append("room", it.get("room").asString)
+                append("movieId", it.get("movieId").asString)
+                append("startHour", it.get("startHour").asString)
+                append("endHour", it.get("endHour").asString)
+                append("price", it.get("price").asString)
             }
             bsonTimeSlots.add(bsonTimeSlot)
         }
