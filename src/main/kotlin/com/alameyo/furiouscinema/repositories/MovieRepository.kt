@@ -20,7 +20,22 @@ class MovieRepository(@Autowired private val database: MongoDatabase) {
         }
         reviewsCollection.insertOne(reviewDocument)
     }
+
     fun getReviews(movieId: String) = reviewsCollection.find(eq("movieId", movieId)).projection(excludeId()).toList()
 
     fun getReviews() = reviewsCollection.find().projection(excludeId()).toList()
+
+    fun getAverageRatingForMovie(movieId: String): Double {
+        val reviews = reviewsCollection.find(eq("movieId", movieId)).projection(excludeId()).toList()
+        var sum = 0.0
+        var elements = 0.0
+        reviews.forEach {
+            sum += it["rate"].toString().toInt()
+            elements++
+        }
+        return when {
+            elements>0 -> sum/elements
+            else -> -1.0
+        }
+    }
 }

@@ -6,8 +6,7 @@ import com.alameyo.furiouscinema.repositories.MovieRepository
 import org.bson.Document
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
-import org.springframework.http.HttpStatus.CREATED
-import org.springframework.http.HttpStatus.OK
+import org.springframework.http.HttpStatus.*
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -34,4 +33,12 @@ class MoviesController {
 
     @GetMapping("/furious/movie/reviews")
     fun reviews() = ResponseEntity<List<Document>>(movieRepository.getReviews(), OK)
+
+    @GetMapping("/furious/movie/reviews/average/{movieId}")
+    fun averageRating(@PathVariable movieId: String): ResponseEntity<Double> {
+        return when (val rating = movieRepository.getAverageRatingForMovie(movieId)) {
+            -1.0 -> ResponseEntity(NOT_FOUND)
+            else -> ResponseEntity(rating, OK)
+        }
+    }
 }
