@@ -6,9 +6,15 @@ import com.alameyo.furiouscinema.repositories.MovieRepository
 import org.bson.Document
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
-import org.springframework.http.HttpStatus.*
+import org.springframework.http.HttpStatus.CREATED
+import org.springframework.http.HttpStatus.NOT_FOUND
+import org.springframework.http.HttpStatus.OK
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class MoviesController {
@@ -18,9 +24,7 @@ class MoviesController {
     lateinit var movieRepository: MovieRepository
 
     @GetMapping("/furious/movie/details/{movieId}")
-    fun getMovieDetails(@PathVariable movieId: String): ResponseEntity<Any> {
-        return ResponseEntity(furiousHttpClient.fetchMovieDetails(movieId), OK)
-    }
+    fun getMovieDetails(@PathVariable movieId: String) = ResponseEntity(furiousHttpClient.fetchMovieDetails(movieId), OK)
 
     @PostMapping("/furious/movie/review/{movieId}")
     fun reviewMovie(@PathVariable movieId: String, @RequestBody body: String): HttpStatus {

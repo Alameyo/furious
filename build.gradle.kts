@@ -4,6 +4,7 @@ plugins {
     kotlin("jvm") version "1.5.31"
     kotlin("plugin.spring") version "1.5.31"
     id("org.sonarqube" ) version "3.0"
+    id( "io.gitlab.arturbosch.detekt") version "1.18.1"
 }
 group = "org.example"
 version = "1.0-SNAPSHOT"
@@ -23,4 +24,11 @@ dependencies {
 
 tasks.getByName<Test>("test") {
     useJUnitPlatform()
+}
+
+detekt {
+    buildUponDefaultConfig = true
+    allRules = false
+    source = files("$projectDir")
+    config = files("$projectDir/src/main/resources/detekt-config.yml")
 }
