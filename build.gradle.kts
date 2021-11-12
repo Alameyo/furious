@@ -5,6 +5,7 @@ plugins {
     kotlin("plugin.spring") version "1.5.31"
     id("org.sonarqube" ) version "3.0"
     id( "io.gitlab.arturbosch.detekt") version "1.18.1"
+    id("jacoco")
 }
 group = "org.example"
 version = "1.0-SNAPSHOT"
