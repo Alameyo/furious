@@ -52,6 +52,32 @@ class TimeTableValidatorTest {
     }
 
     @Test
+    fun `Time conflict between slots - should not throw exception`() {
+        val validInput =
+            """{
+                "date": "2021-11-11",
+                "timeSlots": [
+                {
+                  "room": 4,
+                  "movieId": "tt0232500",
+                  "startHour": "12:40",
+                  "endHour": "14:50",
+                  "price": "22"
+                },
+                {
+                  "room": 4,
+                  "movieId": "tt0232500",
+                  "startHour": "14:10",
+                  "endHour": "16:50",
+                  "price": "22"
+                }
+              ]
+            }""".trim()
+
+        assertThrows(InputValidationException::class.java) { timeTableValidator.validate(validInput) }
+    }
+
+    @Test
     fun `If input have invalid date - should throw InputValidationException`() {
         val invalidDateJson =
             """{
