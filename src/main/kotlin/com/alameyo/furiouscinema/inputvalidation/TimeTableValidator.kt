@@ -1,6 +1,7 @@
 package com.alameyo.furiouscinema.inputvalidation
 
 import com.alameyo.furiouscinema.asJsonObject
+import com.alameyo.furiouscinema.toDate
 import com.alameyo.furiouscinema.toTime
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -10,12 +11,16 @@ import org.springframework.stereotype.Component
 
 @Component
 class TimeTableValidator : FuriousValidator {
+    private val movieIdValidator = MovieIdValidator()
+
     override fun validate(value: Any) {
         if (value !is String) {
             throw InputValidationException()
         } else {
             try {
                 val jsonTimeTable = value.asJsonObject()
+                checkIfRoomsParseToInt(jsonTimeTable)
+                checkIfMovieIdAreValid(jsonTimeTable)
                 checkIfRequiredFieldsExists(jsonTimeTable)
                 checkIfTimesAreProperlyFormatted(jsonTimeTable)
                 checkForTimeConflicts(jsonTimeTable)
@@ -29,8 +34,8 @@ class TimeTableValidator : FuriousValidator {
         val timeslots = jsonTimeTable["timeSlots"].asJsonArray ?: throw InputValidationException()
         timeslots.forEach {
             if (it is JsonObject) {
-                it["room"]?.asString ?: throw InputValidationException()
-                it["movieId"]?.asString ?: throw InputValidationException()
+                it["room"] ?: throw InputValidationException()
+                it["movieId"] ?: throw InputValidationException()
                 it["startHour"]?.asString ?: throw InputValidationException()
                 it["endHour"]?.asString
                 it["price"]?.asString ?: throw InputValidationException()
@@ -38,9 +43,24 @@ class TimeTableValidator : FuriousValidator {
         }
     }
 
+    private fun checkIfRoomsParseToInt(jsonTimeTable: JsonObject) {
+        val timeslots = jsonTimeTable["timeSlots"].asJsonArray ?: throw InputValidationException()
+        timeslots.forEach {
+            if (it is JsonObject) {
+                try {
+                    it["room"].asInt
+                } catch (exception: NumberFormatException) {
+                    throw InputValidationException()
+                }
+            }
+        }
+    }
+
     private fun checkIfTimesAreProperlyFormatted(jsonTimeTable: JsonObject) {
+        val dateJson = jsonTimeTable["date"]
         val timeslots = jsonTimeTable["timeSlots"].asJsonArray
         try {
+            dateJson.asString.toDate()
             timeslots.forEach {
                 it as JsonObject
                 it["startHour"].asString.toTime()
@@ -48,6 +68,15 @@ class TimeTableValidator : FuriousValidator {
             }
         } catch (exception: DateTimeParseException) {
             throw InputValidationException()
+        }
+    }
+
+    private fun checkIfMovieIdAreValid(jsonTimeTable: JsonObject) {
+        val timeslots = jsonTimeTable["timeSlots"].asJsonArray
+        timeslots.forEach {
+            if (it is JsonObject) {
+                movieIdValidator.validate(it["movieId"].asString)
+            }
         }
     }
 
