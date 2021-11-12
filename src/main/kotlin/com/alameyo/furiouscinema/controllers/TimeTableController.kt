@@ -1,10 +1,12 @@
 package com.alameyo.furiouscinema.controllers
 
 import com.alameyo.furiouscinema.asJsonObject
+import com.alameyo.furiouscinema.inputvalidation.InputValidationException
 import com.alameyo.furiouscinema.inputvalidation.TimeTableValidator
 import com.alameyo.furiouscinema.repositories.TimeTableRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.HttpStatus.OK
 import org.springframework.http.ResponseEntity
@@ -33,9 +35,20 @@ class TimeTableController {
 
     @PutMapping("/furious/timetable")
     fun putTimeTable(@RequestBody body: String): HttpStatus {
+        if (validateInput(body)) return BAD_REQUEST
         return when(timeTableRepository.createOrReplaceTimeTable(body.asJsonObject())){
             true -> CREATED
             false -> OK
         }
+    }
+
+    private fun validateInput(body: String): Boolean {
+        try {
+            timeTableValidator.validate(body)
+        } catch (exception: InputValidationException) {
+            println(exception)
+            return true
+        }
+        return false
     }
 }
