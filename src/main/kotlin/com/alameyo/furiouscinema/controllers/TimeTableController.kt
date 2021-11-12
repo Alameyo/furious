@@ -1,8 +1,11 @@
 package com.alameyo.furiouscinema.controllers
 
 import com.alameyo.furiouscinema.asJsonObject
+import com.alameyo.furiouscinema.inputvalidation.TimeTableValidator
 import com.alameyo.furiouscinema.repositories.TimeTableRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.HttpStatus.OK
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -16,6 +19,9 @@ class TimeTableController {
     @Autowired
     lateinit var timeTableRepository: TimeTableRepository
 
+    @Autowired
+    lateinit var timeTableValidator: TimeTableValidator
+
     @GetMapping("/furious/timetable/{date}")
     fun getTimeTable(@PathVariable(value = "date") date: String) = ResponseEntity(timeTableRepository.getTimeTable(date), OK)
 
@@ -26,7 +32,10 @@ class TimeTableController {
     fun getTimeTables() = ResponseEntity(timeTableRepository.getTimeTables(), OK)
 
     @PutMapping("/furious/timetable")
-    fun putTimeTable(@RequestBody body: String) {
-        timeTableRepository.createOrReplaceTimeTable(body.asJsonObject())
+    fun putTimeTable(@RequestBody body: String): HttpStatus {
+        return when(timeTableRepository.createOrReplaceTimeTable(body.asJsonObject())){
+            true -> CREATED
+            false -> OK
+        }
     }
 }

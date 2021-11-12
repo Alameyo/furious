@@ -19,27 +19,34 @@ class TimeTableRepository(@Autowired private val database: MongoDatabase) {
 
     fun getTimeTables() = timeTables.find().projection(excludeId()).toList()
 
-    fun createOrReplaceTimeTable(timeTable: JsonObject) {
-        val bsonTimeSlots = mutableListOf<Document>()
-        val list = timeTable.getAsJsonArray("timeSlots").toList()
+    fun createOrReplaceTimeTable(timeTable: JsonObject): Boolean {
         val date = timeTable["date"].asString
-        list.forEach {
-            val bsonTimeSlot = Document().apply {
-                it as JsonObject
-                append("room", it.get("room").asString)
-                append("movieId", it.get("movieId").asString)
-                append("startHour", it.get("startHour").asString)
-                append("endHour", it.get("endHour").asString)
-                append("price", it.get("price").asString)
+        val exist = getTimeTable(date)?.isNotEmpty() ?: false
+
+        val listOfTimeSlots = timeTable.getAsJsonArray("timeSlots").toList()
+        val bsonTimeSlots = mutableListOf<Document>()
+
+        bsonTimeSlots.apply {
+            listOfTimeSlots.forEach {
+                add(toTimeSlotDocument(it as JsonObject))
             }
-            bsonTimeSlots.add(bsonTimeSlot)
         }
+
         val timeTableDocument = Document().apply {
             append("date", date)
             append("timeSlots", bsonTimeSlots)
         }
         val replaceUpsertOption = ReplaceOptions().upsert(true)
-        timeTables.replaceOne(eq("date", date), timeTableDocument, replaceUpsertOption)
+        val result = timeTables.replaceOne(eq("date", date), timeTableDocument, replaceUpsertOption)
+        return result.wasAcknowledged() && !exist
+    }
+
+    private fun toTimeSlotDocument(it: JsonObject) = Document().apply {
+        append("room", it["room"].asString)
+        append("movieId", it["movieId"].asString)
+        append("startHour", it["startHour"].asString)
+        append("endHour", it["endHour"].asString)
+        append("price", it["price"].asString)
     }
 
     private fun today() = ofPattern("yyyy-MM-dd").format(now())
