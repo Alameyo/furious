@@ -19,10 +19,8 @@ class TimeTableRepository(@Autowired private val database: MongoDatabase) {
 
     fun getTimeTables() = timeTables.find().projection(excludeId()).toList()
 
-    fun createOrReplaceTimeTable(timeTable: JsonObject): Boolean {
+    fun createTimeTableDocument(timeTable: JsonObject): Document {
         val date = timeTable["date"].asString
-        val exist = getTimeTable(date)?.isNotEmpty() ?: false
-
         val listOfTimeSlots = timeTable.getAsJsonArray("timeSlots").toList()
         val bsonTimeSlots = mutableListOf<Document>()
 
@@ -32,10 +30,15 @@ class TimeTableRepository(@Autowired private val database: MongoDatabase) {
             }
         }
 
-        val timeTableDocument = Document().apply {
+        return Document().apply {
             append("date", date)
             append("timeSlots", bsonTimeSlots)
         }
+    }
+
+    fun commitTimeTable(timeTableDocument: Document): Boolean {
+        val date = timeTableDocument["date"].toString()
+        val exist = getTimeTable(date)?.isNotEmpty() ?: false
         val replaceUpsertOption = ReplaceOptions().upsert(true)
         val result = timeTables.replaceOne(eq("date", date), timeTableDocument, replaceUpsertOption)
         return result.wasAcknowledged() && !exist

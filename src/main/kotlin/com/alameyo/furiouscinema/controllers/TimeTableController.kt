@@ -36,7 +36,8 @@ class TimeTableController {
     @PutMapping("/furious/timetable")
     fun putTimeTable(@RequestBody body: String): HttpStatus {
         if (validateInput(body)) return BAD_REQUEST
-        return when(timeTableRepository.createOrReplaceTimeTable(body.asJsonObject())){
+        val timeTableDocument = timeTableRepository.createTimeTableDocument(body.asJsonObject())
+        return when (timeTableRepository.commitTimeTable(timeTableDocument)) {
             true -> CREATED
             false -> OK
         }
