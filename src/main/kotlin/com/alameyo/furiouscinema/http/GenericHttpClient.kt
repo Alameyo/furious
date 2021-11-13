@@ -4,6 +4,7 @@ import java.lang.System.setProperty
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
+import java.net.http.HttpRequest.BodyPublishers.ofString
 import java.net.http.HttpRequest.newBuilder
 import java.net.http.HttpResponse
 import java.net.http.HttpResponse.BodyHandlers.ofString
@@ -21,6 +22,11 @@ class GenericHttpClient {
 
     fun httpGet(addressUri: URI): HttpResponse<String>? {
         val httpRequest = newBuilder().uri(addressUri).build()
+        return sendRequest(httpRequest)
+    }
+
+    fun httpPost(addressUri: URI, body: String): HttpResponse<String>? {
+        val httpRequest = newBuilder().uri(addressUri).POST(ofString(body)).build()
         return sendRequest(httpRequest)
     }
 
