@@ -10,8 +10,6 @@ class MovieReviewValidator : FuriousValidator {
     private val minRate = 1
     private val maxRate = 5
     private val maxCommentLength = 250
-    @Autowired
-    private lateinit var movieIdValidator: MovieIdValidator
 
     override fun validate(value: String) {
         try {
