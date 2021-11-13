@@ -2,6 +2,9 @@ package com.alameyo.furiouscinema.controllers
 
 import com.alameyo.furiouscinema.asJsonObject
 import com.alameyo.furiouscinema.http.FuriousHttpClient
+import com.alameyo.furiouscinema.inputvalidation.InputValidationException
+import com.alameyo.furiouscinema.inputvalidation.MovieIdValidator
+import com.alameyo.furiouscinema.inputvalidation.MovieReviewValidator
 import com.alameyo.furiouscinema.repositories.MovieRepository
 import org.bson.Document
 import org.springframework.beans.factory.annotation.Autowired
@@ -22,12 +25,17 @@ class MoviesController {
     lateinit var furiousHttpClient: FuriousHttpClient
     @Autowired
     lateinit var movieRepository: MovieRepository
+    @Autowired
+    lateinit var movieReviewValidator: MovieReviewValidator
+    @Autowired
+    lateinit var movieIdValidator: MovieIdValidator
 
     @GetMapping("/furious/movie/details/{movieId}")
     fun getMovieDetails(@PathVariable movieId: String) = ResponseEntity(furiousHttpClient.fetchMovieDetails(movieId), OK)
 
     @PostMapping("/furious/movie/review/{movieId}")
     fun reviewMovie(@PathVariable movieId: String, @RequestBody body: String): HttpStatus {
+        validateMovieReviewInput(movieId, body)
         movieRepository.reviewMovie(movieId, body.asJsonObject())
         return CREATED
     }
@@ -44,5 +52,16 @@ class MoviesController {
             -1.0 -> ResponseEntity(NOT_FOUND)
             else -> ResponseEntity(rating, OK)
         }
+    }
+
+    private fun validateMovieReviewInput(movieId: String ,body: String): Boolean {
+        try {
+            movieIdValidator.validate(movieId)
+            movieReviewValidator.validate(body)
+        } catch (exception: InputValidationException) {
+            println(exception)
+            return true
+        }
+        return false
     }
 }
