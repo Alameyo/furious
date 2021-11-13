@@ -15,7 +15,7 @@ import java.time.format.DateTimeFormatter.ofPattern
 class TimeTableRepository(@Autowired private val database: MongoDatabase) {
     private val timeTables = database.getCollection("timeTables")
 
-    fun getTimeTable(date: String = today()) = timeTables.find(eq("date", date)).projection(excludeId()).first()
+    fun getTimeTable(date: String = today()): Document? = timeTables.find(eq("date", date)).projection(excludeId()).first()
 
     fun createTimeTableDocument(timeTable: JsonObject): Document {
         val date = timeTable["date"].asString

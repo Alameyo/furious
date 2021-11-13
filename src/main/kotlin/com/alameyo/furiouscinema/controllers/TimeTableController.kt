@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.CREATED
+import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.HttpStatus.OK
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -32,7 +33,10 @@ class TimeTableController : FuriousController {
     fun getTimeTable(@PathVariable(value = "date") date: String): ResponseEntity<Document> {
         return when {
             validateInput(date, dateValidator) -> ResponseEntity(BAD_REQUEST)
-            else -> ResponseEntity(timeTableRepository.getTimeTable(date), OK)
+            else -> {
+                val timetable = timeTableRepository.getTimeTable(date)
+                timetable?.let { ResponseEntity(it, OK) } ?: ResponseEntity(NOT_FOUND)
+            }
         }
     }
 
