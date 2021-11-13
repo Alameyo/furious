@@ -12,11 +12,11 @@ import org.springframework.stereotype.Component
 class MovieRepository(@Autowired private val database: MongoDatabase) {
     private val reviewsCollection = database.getCollection("reviews")
 
-    fun createMovieReviewDocument(movieId: String, rate: JsonObject): Document {
+    fun createMovieReviewDocument(movieId: String, review: JsonObject): Document {
         return Document().apply {
             append("movieId", movieId)
-            append("rate", rate.get("rate").asInt)
-            append("comment", rate.get("comment")?.asString ?: "")
+            append("rate", review.get("rate").asInt)
+            append("comment", review.get("comment")?.asString ?: "")
         }
     }
 
