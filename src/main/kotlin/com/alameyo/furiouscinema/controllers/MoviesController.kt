@@ -2,7 +2,6 @@ package com.alameyo.furiouscinema.controllers
 
 import com.alameyo.furiouscinema.asJsonObject
 import com.alameyo.furiouscinema.http.FuriousHttpClient
-import com.alameyo.furiouscinema.inputvalidation.InputValidationException
 import com.alameyo.furiouscinema.inputvalidation.MovieIdValidator
 import com.alameyo.furiouscinema.inputvalidation.MovieReviewValidator
 import com.alameyo.furiouscinema.repositories.MovieRepository
@@ -20,49 +19,59 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class MoviesController {
+class MoviesController : FuriousController {
     @Autowired
     lateinit var furiousHttpClient: FuriousHttpClient
+
     @Autowired
     lateinit var movieRepository: MovieRepository
+
     @Autowired
     lateinit var movieReviewValidator: MovieReviewValidator
+
     @Autowired
     lateinit var movieIdValidator: MovieIdValidator
 
     @GetMapping("/furious/movie/details/{movieId}")
-    fun getMovieDetails(@PathVariable movieId: String) = ResponseEntity(furiousHttpClient.fetchMovieDetails(movieId), OK)
+    fun getMovieDetails(@PathVariable movieId: String): ResponseEntity<Any> {
+        return when {
+            validateInput(movieId, movieIdValidator) -> ResponseEntity<Any>(BAD_REQUEST)
+            else -> ResponseEntity(furiousHttpClient.fetchMovieDetails(movieId), OK)
+        }
+    }
 
     @PostMapping("/furious/movie/review/{movieId}")
     fun reviewMovie(@PathVariable movieId: String, @RequestBody body: String): ResponseEntity<*> {
-        if (validateMovieReviewInput(movieId, body)) return ResponseEntity<Any>(BAD_REQUEST)
-        val reviewDocument = movieRepository.createMovieReviewDocument(movieId, body.asJsonObject())
-        movieRepository.commitReview(reviewDocument)
-        return ResponseEntity<Any>(CREATED)
+        return when {
+            validateInput(movieId, movieIdValidator) -> ResponseEntity<Any>(BAD_REQUEST)
+            validateInput(body, movieReviewValidator) -> ResponseEntity<Any>(BAD_REQUEST)
+            else -> {
+                val reviewDocument = movieRepository.createMovieReviewDocument(movieId, body.asJsonObject())
+                movieRepository.commitReview(reviewDocument)
+                ResponseEntity<Any>(CREATED)
+            }
+        }
     }
 
     @GetMapping("/furious/movie/review/{movieId}")
-    fun review(@PathVariable movieId: String) = ResponseEntity<List<Document>>(movieRepository.getReviews(movieId), OK)
+    fun review(@PathVariable movieId: String): ResponseEntity<List<Document>> {
+        return when {
+            validateInput(movieId, movieIdValidator) -> ResponseEntity(BAD_REQUEST)
+            else -> ResponseEntity<List<Document>>(movieRepository.getReviews(movieId), OK)
+        }
+    }
 
     @GetMapping("/furious/movie/reviews")
     fun reviews() = ResponseEntity<List<Document>>(movieRepository.getReviews(), OK)
 
     @GetMapping("/furious/movie/reviews/average/{movieId}")
     fun averageRating(@PathVariable movieId: String): ResponseEntity<Double> {
-        return when (val rating = movieRepository.getAverageRatingForMovie(movieId)) {
-            -1.0 -> ResponseEntity(NOT_FOUND)
-            else -> ResponseEntity(rating, OK)
+        return when {
+            validateInput(movieId, movieIdValidator) -> ResponseEntity(BAD_REQUEST)
+            else -> when (val rating = movieRepository.getAverageRatingForMovie(movieId)) {
+                -1.0 -> ResponseEntity(NOT_FOUND)
+                else -> ResponseEntity(rating, OK)
+            }
         }
-    }
-
-    private fun validateMovieReviewInput(movieId: String, body: String): Boolean {
-        try {
-            movieIdValidator.validate(movieId)
-            movieReviewValidator.validate(body)
-        } catch (exception: InputValidationException) {
-            println("Log: $exception")
-            return true
-        }
-        return false
     }
 }

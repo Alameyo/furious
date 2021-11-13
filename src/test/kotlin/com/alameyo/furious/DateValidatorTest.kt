@@ -20,5 +20,4 @@ class DateValidatorTest {
         val invalidDateJson = """2021-11-11""".trim()
         assertDoesNotThrow { dateValidator.validate(invalidDateJson) }
     }
-
 }

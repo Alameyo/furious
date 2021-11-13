@@ -2,8 +2,6 @@ package com.alameyo.furiouscinema.controllers
 
 import com.alameyo.furiouscinema.asJsonObject
 import com.alameyo.furiouscinema.inputvalidation.DateValidator
-import com.alameyo.furiouscinema.inputvalidation.FuriousValidator
-import com.alameyo.furiouscinema.inputvalidation.InputValidationException
 import com.alameyo.furiouscinema.inputvalidation.TimeTableValidator
 import com.alameyo.furiouscinema.repositories.TimeTableRepository
 import org.bson.Document
@@ -20,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class TimeTableController {
+class TimeTableController : FuriousController {
     @Autowired
     lateinit var timeTableRepository: TimeTableRepository
 
@@ -32,8 +30,10 @@ class TimeTableController {
 
     @GetMapping("/furious/timetable/{date}")
     fun getTimeTable(@PathVariable(value = "date") date: String): ResponseEntity<Document> {
-        if (validateInput(date, timeTableValidator)) return ResponseEntity(BAD_REQUEST)
-        return ResponseEntity(timeTableRepository.getTimeTable(date), OK)
+        return when {
+            validateInput(date, dateValidator) -> ResponseEntity(BAD_REQUEST)
+            else -> ResponseEntity(timeTableRepository.getTimeTable(date), OK)
+        }
     }
 
     @GetMapping("/furious/timetable")
@@ -47,15 +47,5 @@ class TimeTableController {
             true -> CREATED
             false -> OK
         }
-    }
-
-    private fun validateInput(body: String, validator: FuriousValidator): Boolean {
-        try {
-            validator.validate(body)
-        } catch (exception: InputValidationException) {
-            println("Log: $exception")
-            return true
-        }
-        return false
     }
 }
