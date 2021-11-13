@@ -13,20 +13,16 @@ import org.springframework.stereotype.Component
 class TimeTableValidator : FuriousValidator {
     private val movieIdValidator = MovieIdValidator()
 
-    override fun validate(value: Any) {
-        if (value !is String) {
+    override fun validate(value: String) {
+        try {
+            val jsonTimeTable = value.asJsonObject()
+            checkIfRoomsParseToInt(jsonTimeTable)
+            checkIfMovieIdAreValid(jsonTimeTable)
+            checkIfRequiredFieldsExists(jsonTimeTable)
+            checkIfTimesAreProperlyFormatted(jsonTimeTable)
+            checkForTimeConflicts(jsonTimeTable)
+        } catch (e: JsonParseException) {
             throw InputValidationException()
-        } else {
-            try {
-                val jsonTimeTable = value.asJsonObject()
-                checkIfRoomsParseToInt(jsonTimeTable)
-                checkIfMovieIdAreValid(jsonTimeTable)
-                checkIfRequiredFieldsExists(jsonTimeTable)
-                checkIfTimesAreProperlyFormatted(jsonTimeTable)
-                checkForTimeConflicts(jsonTimeTable)
-            } catch (e: JsonParseException) {
-                throw InputValidationException()
-            }
         }
     }
 
