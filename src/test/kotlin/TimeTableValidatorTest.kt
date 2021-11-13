@@ -52,7 +52,24 @@ class TimeTableValidatorTest {
     }
 
     @Test
-    fun `Time conflict between slots - should not throw exception`() {
+    fun `Required field missing from timeslot - should throw exception`() {
+        val missingStartHourFieldInput =
+            """{
+                "date": "2021-11-11",
+                "timeSlots": [
+                {
+                  "room": 4,
+                  "movieId": "tt0232500",
+                  "endHour": "14:50",
+                  "price": "22"
+                }
+              ]
+            }""".trim()
+        assertThrows(InputValidationException::class.java) { timeTableValidator.validate(missingStartHourFieldInput) }
+    }
+
+    @Test
+    fun `Time conflict between slots - should throw exception`() {
         val validInput =
             """{
                 "date": "2021-11-11",
