@@ -1,9 +1,12 @@
 package com.alameyo.furiouscinema.controllers
 
 import com.alameyo.furiouscinema.asJsonObject
+import com.alameyo.furiouscinema.inputvalidation.DateValidator
+import com.alameyo.furiouscinema.inputvalidation.FuriousValidator
 import com.alameyo.furiouscinema.inputvalidation.InputValidationException
 import com.alameyo.furiouscinema.inputvalidation.TimeTableValidator
 import com.alameyo.furiouscinema.repositories.TimeTableRepository
+import org.bson.Document
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
@@ -20,11 +23,18 @@ import org.springframework.web.bind.annotation.RestController
 class TimeTableController {
     @Autowired
     lateinit var timeTableRepository: TimeTableRepository
+
     @Autowired
     lateinit var timeTableValidator: TimeTableValidator
 
+    @Autowired
+    lateinit var dateValidator: DateValidator
+
     @GetMapping("/furious/timetable/{date}")
-    fun getTimeTable(@PathVariable(value = "date") date: String) = ResponseEntity(timeTableRepository.getTimeTable(date), OK)
+    fun getTimeTable(@PathVariable(value = "date") date: String): ResponseEntity<Document> {
+        if (validateInput(date, timeTableValidator)) return ResponseEntity(BAD_REQUEST)
+        return ResponseEntity(timeTableRepository.getTimeTable(date), OK)
+    }
 
     @GetMapping("/furious/timetable")
     fun getTimeTable() = ResponseEntity(timeTableRepository.getTimeTable(), OK)
@@ -34,7 +44,7 @@ class TimeTableController {
 
     @PutMapping("/furious/timetable")
     fun putTimeTable(@RequestBody body: String): HttpStatus {
-        if (validateInput(body)) return BAD_REQUEST
+        if (validateInput(body, timeTableValidator)) return BAD_REQUEST
         val timeTableDocument = timeTableRepository.createTimeTableDocument(body.asJsonObject())
         return when (timeTableRepository.commitTimeTable(timeTableDocument)) {
             true -> CREATED
@@ -42,9 +52,9 @@ class TimeTableController {
         }
     }
 
-    private fun validateInput(body: String): Boolean {
+    private fun validateInput(body: String, validator: FuriousValidator): Boolean {
         try {
-            timeTableValidator.validate(body)
+            validator.validate(body)
         } catch (exception: InputValidationException) {
             println("Log: $exception")
             return true

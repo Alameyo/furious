@@ -1,7 +1,6 @@
 package com.alameyo.furiouscinema.inputvalidation
 
 import com.alameyo.furiouscinema.asJsonObject
-import com.alameyo.furiouscinema.toDate
 import com.alameyo.furiouscinema.toTime
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -12,6 +11,7 @@ import org.springframework.stereotype.Component
 @Component
 class TimeTableValidator : FuriousValidator {
     private val movieIdValidator = MovieIdValidator()
+    private val dateValidator = DateValidator()
 
     override fun validate(value: String) {
         try {
@@ -53,10 +53,10 @@ class TimeTableValidator : FuriousValidator {
     }
 
     private fun checkIfTimesAreProperlyFormatted(jsonTimeTable: JsonObject) {
-        val dateJson = jsonTimeTable["date"]
+        val dateJson = jsonTimeTable["date"].asString
         val timeslots = jsonTimeTable["timeSlots"].asJsonArray
         try {
-            dateJson.asString.toDate()
+            dateValidator.validate(dateJson)
             timeslots.forEach {
                 it as JsonObject
                 it["startHour"].asString.toTime()
