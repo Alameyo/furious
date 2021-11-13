@@ -37,7 +37,7 @@ class MoviesController {
     @PostMapping("/furious/movie/review/{movieId}")
     fun reviewMovie(@PathVariable movieId: String, @RequestBody body: String): HttpStatus {
         if(validateMovieReviewInput(movieId, body)) return BAD_REQUEST
-        val reviewDocument = movieRepository.reviewMovie(movieId, body.asJsonObject())
+        val reviewDocument = movieRepository.createMovieReviewDocument(movieId, body.asJsonObject())
         movieRepository.commitReview(reviewDocument)
         return CREATED
     }
