@@ -25,7 +25,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ActiveProfiles(profiles = ["dev"])
 @Disabled("Before enabling run application and database, depends also on open movie api")
 class MovieIntegrationTests(@Autowired private val database: MongoDatabase) {
-
     @Autowired
     private lateinit var movieRepository: MovieRepository
     private val testHttpClient = TestingHttpClient()

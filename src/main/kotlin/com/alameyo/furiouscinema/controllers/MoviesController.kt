@@ -23,13 +23,10 @@ import org.springframework.web.bind.annotation.RestController
 class MoviesController {
     @Autowired
     lateinit var furiousHttpClient: FuriousHttpClient
-
     @Autowired
     lateinit var movieRepository: MovieRepository
-
     @Autowired
     lateinit var movieReviewValidator: MovieReviewValidator
-
     @Autowired
     lateinit var movieIdValidator: MovieIdValidator
 

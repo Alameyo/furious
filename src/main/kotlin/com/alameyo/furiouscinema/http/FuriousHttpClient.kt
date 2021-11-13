@@ -7,7 +7,6 @@ import java.net.URI.create
 
 @Component
 class FuriousHttpClient {
-
     private val genericHttpClient = GenericHttpClient()
     @Value("\${omdapi.token}")
     private lateinit var token: String

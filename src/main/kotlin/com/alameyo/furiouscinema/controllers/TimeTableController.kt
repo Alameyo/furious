@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController
 class TimeTableController {
     @Autowired
     lateinit var timeTableRepository: TimeTableRepository
-
     @Autowired
     lateinit var timeTableValidator: TimeTableValidator
 

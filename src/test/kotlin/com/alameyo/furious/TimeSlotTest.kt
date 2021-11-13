@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 
 class TimeSlotTest {
+
     @Test
     fun `When endHour of TimeSlot is before startHour - should throw IllegalArgumentException`() {
         val startTime = "13:00".toTime()
