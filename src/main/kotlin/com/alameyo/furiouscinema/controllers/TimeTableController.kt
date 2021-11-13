@@ -39,9 +39,6 @@ class TimeTableController {
     @GetMapping("/furious/timetable")
     fun getTimeTable() = ResponseEntity(timeTableRepository.getTimeTable(), OK)
 
-    @GetMapping("/furious/timetables")
-    fun getTimeTables() = ResponseEntity(timeTableRepository.getTimeTables(), OK)
-
     @PutMapping("/furious/timetable")
     fun putTimeTable(@RequestBody body: String): HttpStatus {
         if (validateInput(body, timeTableValidator)) return BAD_REQUEST

@@ -17,8 +17,6 @@ class TimeTableRepository(@Autowired private val database: MongoDatabase) {
 
     fun getTimeTable(date: String = today()) = timeTables.find(eq("date", date)).projection(excludeId()).first()
 
-    fun getTimeTables() = timeTables.find().projection(excludeId()).toList()
-
     fun createTimeTableDocument(timeTable: JsonObject): Document {
         val date = timeTable["date"].asString
         val listOfTimeSlots = timeTable.getAsJsonArray("timeSlots").toList()
