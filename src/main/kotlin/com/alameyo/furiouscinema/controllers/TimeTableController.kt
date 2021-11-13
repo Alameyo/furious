@@ -47,7 +47,7 @@ class TimeTableController {
         try {
             timeTableValidator.validate(body)
         } catch (exception: InputValidationException) {
-            println(exception)
+            println("Log: $exception")
             return true
         }
         return false

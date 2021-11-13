@@ -2,7 +2,6 @@ package com.alameyo.furiouscinema.inputvalidation
 
 import com.alameyo.furiouscinema.asJsonObject
 import com.google.gson.JsonParseException
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 @Component

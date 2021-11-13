@@ -8,7 +8,6 @@ import com.alameyo.furiouscinema.inputvalidation.MovieReviewValidator
 import com.alameyo.furiouscinema.repositories.MovieRepository
 import org.bson.Document
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.HttpStatus.NOT_FOUND
@@ -24,10 +23,13 @@ import org.springframework.web.bind.annotation.RestController
 class MoviesController {
     @Autowired
     lateinit var furiousHttpClient: FuriousHttpClient
+
     @Autowired
     lateinit var movieRepository: MovieRepository
+
     @Autowired
     lateinit var movieReviewValidator: MovieReviewValidator
+
     @Autowired
     lateinit var movieIdValidator: MovieIdValidator
 
@@ -35,11 +37,11 @@ class MoviesController {
     fun getMovieDetails(@PathVariable movieId: String) = ResponseEntity(furiousHttpClient.fetchMovieDetails(movieId), OK)
 
     @PostMapping("/furious/movie/review/{movieId}")
-    fun reviewMovie(@PathVariable movieId: String, @RequestBody body: String): HttpStatus {
-        if(validateMovieReviewInput(movieId, body)) return BAD_REQUEST
+    fun reviewMovie(@PathVariable movieId: String, @RequestBody body: String): ResponseEntity<*> {
+        if (validateMovieReviewInput(movieId, body)) return ResponseEntity<Any>(BAD_REQUEST)
         val reviewDocument = movieRepository.createMovieReviewDocument(movieId, body.asJsonObject())
         movieRepository.commitReview(reviewDocument)
-        return CREATED
+        return ResponseEntity<Any>(CREATED)
     }
 
     @GetMapping("/furious/movie/review/{movieId}")
@@ -56,12 +58,12 @@ class MoviesController {
         }
     }
 
-    private fun validateMovieReviewInput(movieId: String ,body: String): Boolean {
+    private fun validateMovieReviewInput(movieId: String, body: String): Boolean {
         try {
             movieIdValidator.validate(movieId)
             movieReviewValidator.validate(body)
         } catch (exception: InputValidationException) {
-            println(exception)
+            println("Log: $exception")
             return true
         }
         return false
