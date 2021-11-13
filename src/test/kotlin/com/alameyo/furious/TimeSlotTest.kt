@@ -1,3 +1,5 @@
+package com.alameyo.furious
+
 import com.alameyo.furiouscinema.inputvalidation.TimeSlot
 import com.alameyo.furiouscinema.toTime
 import org.junit.jupiter.api.Assertions.assertFalse

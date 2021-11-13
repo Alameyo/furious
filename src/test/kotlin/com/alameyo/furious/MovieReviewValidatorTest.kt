@@ -1,3 +1,5 @@
+package com.alameyo.furious
+
 import com.alameyo.furiouscinema.inputvalidation.InputValidationException
 import com.alameyo.furiouscinema.inputvalidation.MovieReviewValidator
 import org.junit.jupiter.api.Assertions.assertThrows
