@@ -9,6 +9,7 @@ import com.alameyo.furiouscinema.repositories.MovieRepository
 import org.bson.Document
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.HttpStatus.OK
@@ -35,7 +36,7 @@ class MoviesController {
 
     @PostMapping("/furious/movie/review/{movieId}")
     fun reviewMovie(@PathVariable movieId: String, @RequestBody body: String): HttpStatus {
-        validateMovieReviewInput(movieId, body)
+        if(validateMovieReviewInput(movieId, body)) return BAD_REQUEST
         movieRepository.reviewMovie(movieId, body.asJsonObject())
         return CREATED
     }
