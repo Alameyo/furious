@@ -90,7 +90,9 @@ paths:
         "404":
           description: "There is not timetable for today"
     put:
-      description: "Update timetable for a given day"
+      description: "Update timetable for a given day. Requires basic authentication"
+      security:
+        - basicAuth: []
       responses:
         "200":
           description: "Existing timetable was updated"
@@ -98,6 +100,8 @@ paths:
           description: "New timetable was inserted for given day"
         "400":
           description: "Timetable have error in it's formatting"
+        "401":
+          description: "User was not authenticated"
       requestBody:
         content:
           application/json:
@@ -159,3 +163,9 @@ components:
         endHour:
           description: "End hour of movie in 24h format HH:mm"
           type: string
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+security:
+  - basicAuth: [ ]  #
