@@ -21,7 +21,7 @@ Things that should be done on the way to deployment but weren't yet.
 
 * Enable cors if API is meant to be used by web browser
 * More test coverage, use mockito wherever needed
-* Fuzzing
+* More fuzzing
 * More input validation (missing corner cases could come out from fuzzing)
 * Exceptions should be logged, not thrown to console output.
 * Perhaps some improvements to data persistence layer
