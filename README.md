@@ -1,6 +1,13 @@
 This is API for cinema with Fast & Furious movies.  
 
-Swagger/OpenAPI documentation available in docs/furious.yaml
+Swagger/OpenAPI documentation available in `docs/furious.yaml`
+
+As preconfiguration:
+* MongoDB database need to be run `scripts/PullDatabase.sh` will pull docker image of database
+* applications properties need to be supplied with
+  * omdapi.token
+  * spring.security.user.name 
+  * spring.security.user.password
 
 Assumptions:
 * Generally API have 2 collections. Timetable and movie reviews.
