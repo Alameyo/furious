@@ -5,9 +5,9 @@ Swagger/OpenAPI documentation available in `docs/furious.yaml`
 As preconfiguration:
 * MongoDB database need to be run `scripts/PullDatabase.sh` will pull docker image of database
 * applications properties need to be supplied with
-  * omdapi.token
-  * spring.security.user.name 
-  * spring.security.user.password
+  * `omdapi.token`
+  * `spring.security.user.name` 
+  * `spring.security.user.password`
 
 Assumptions:
 * Generally API have 2 collections. Timetable and movie reviews.
@@ -21,7 +21,7 @@ Things that should be done on the way to deployment but weren't yet.
 
 * Enable cors if API is meant to be used by web browser
 * More test coverage, use mockito wherever needed
-* More fuzzing
+* More fuzzing, some can ve found in `scripts/boofuzz`
 * More input validation (missing corner cases could come out from fuzzing)
 * Exceptions should be logged, not thrown to console output.
 * Perhaps some improvements to data persistence layer
