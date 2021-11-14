@@ -22,7 +22,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles(profiles = ["dev"])
-//@Disabled("Before enabling run application and database")
+@Disabled("Before enabling run application and database")
 class TimeTableIntegrationTest(@Autowired private val database: MongoDatabase) {
     val testingHttpClient = TestingHttpClient()
 
