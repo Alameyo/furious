@@ -41,7 +41,7 @@ class TimeTableController : FuriousController {
     }
 
     @GetMapping("/furious/timetable")
-    fun getTimeTable() = ResponseEntity(timeTableRepository.getTimeTable(), OK)
+    fun getTimeTable() = ResponseEntity(timeTableRepository.getTimeTable()?.let { ResponseEntity(it, OK) } ?: ResponseEntity(NOT_FOUND), OK)
 
     @PutMapping("/furious/timetable")
     fun putTimeTable(@RequestBody body: String): HttpStatus {
