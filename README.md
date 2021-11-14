@@ -1,6 +1,6 @@
 This is API for cinema with Fast & Furious movies.  
 
-Swagger/OpenAPI documentation availvable in docs/furious.yaml
+Swagger/OpenAPI documentation available in docs/furious.yaml
 
 Assumptions:
 * Generally API have 2 collections. Timetable and movie reviews.
@@ -12,7 +12,7 @@ Assumptions:
 
 Things that should be done on the way to deployment but weren't yet.
 
-* Authentication for admin
+* Enable cors if API is meant to be used by web browser
 * More test coverage, use mockito wherever needed
 * Fuzzing
 * More input validation (missing corner cases could come out from fuzzing)

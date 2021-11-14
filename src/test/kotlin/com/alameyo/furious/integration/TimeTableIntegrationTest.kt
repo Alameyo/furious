@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
@@ -21,9 +22,16 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles(profiles = ["dev"])
-@Disabled("Before enabling run application and database")
+//@Disabled("Before enabling run application and database")
 class TimeTableIntegrationTest(@Autowired private val database: MongoDatabase) {
     val testingHttpClient = TestingHttpClient()
+
+    @Value("\${spring.security.user.name}")
+    private lateinit var user: String
+
+    @Value("\${spring.security.user.password}")
+    private lateinit var password: String
+    val authenticationPair by lazy { user to password }
 
     @Test
     @Suppress("LongMethod")
@@ -74,14 +82,14 @@ class TimeTableIntegrationTest(@Autowired private val database: MongoDatabase) {
         assertTrue(response1?.statusCode() == 404, "No timetable should be found for given day")
         assertTrue(response1?.body().isNullOrBlank(), "No timetable should be found for given day")
 
-        val response2 = testingHttpClient.put("/timetable", timeTable1)
+        val response2 = testingHttpClient.put("/timetable", timeTable1, authenticationPair)
         assertTrue(response2?.statusCode() == 201, "Response code should be 201 when timetable submitted first time")
 
         val response3 = testingHttpClient.get("/timetable/2021-11-14")
         assertTrue(response3?.body()?.asJsonObject().toString() == timeTable1.toString(), "Should respond with timetable that was provided")
 
 
-        val response4 = testingHttpClient.put("/timetable", timeTable2)
+        val response4 = testingHttpClient.put("/timetable", timeTable2, authenticationPair)
         assertTrue(response4?.statusCode() == 200, "Response code should be 200 after timetable was overwritten")
 
         val response5 = testingHttpClient.get("/timetable/2021-11-14")
@@ -115,12 +123,20 @@ class TimeTableIntegrationTest(@Autowired private val database: MongoDatabase) {
         assertTrue(response1?.statusCode() == 404, "No timetable should be found for given day")
         assertTrue(response1?.body().isNullOrBlank(), "No timetable should be found for given day")
 
-        val response2 = testingHttpClient.put("/timetable", timeTableWithConflict)
+        val response2 = testingHttpClient.put("/timetable", timeTableWithConflict, authenticationPair)
         assertTrue(response2?.statusCode() == 400, "Response code should be 400 as incorrect timetable json was submitted")
 
         val response3 = testingHttpClient.get("/timetable/2021-11-14")
         assertTrue(response3?.statusCode() == 404, "Submitting timetable failed so still no timetable should be found for given day")
         assertTrue(response3?.body().isNullOrBlank(), "Submitting timetable failed so still no timetable should be found for given day")
+    }
+
+    @Test
+    fun `Put with incorrect credentials - should return 401`() {
+        val dummyJson =
+            """{"Dummy": "Json" }""".trim().asJsonObject()
+        val response = testingHttpClient.put("/timetable", dummyJson, "RandomUser" to "IDontKnowPassword")
+        assertTrue(response?.statusCode() == 401, "Response code should be 401 as this user is not authenticated")
     }
 
     @AfterEach

@@ -14,6 +14,7 @@ class GenericHttpClient {
     init {
         setProperty("jdk.tls.namedGroups", "secp521r1")
     }
+
     private val strictSSLParameters = SSLParameters().apply {
         protocols = arrayOf("TLSv1.3")
     }
@@ -30,8 +31,8 @@ class GenericHttpClient {
         return sendRequest(httpRequest)
     }
 
-    fun httpPut(addressUri: URI, body: String): HttpResponse<String>? {
-        val httpRequest = newBuilder().uri(addressUri).PUT(ofString(body)).build()
+    fun httpPut(addressUri: URI, body: String, vararg headers: String = arrayOf()): HttpResponse<String>? {
+        val httpRequest = newBuilder().uri(addressUri).headers(*headers).PUT(ofString(body)).build()
         return sendRequest(httpRequest)
     }
 
