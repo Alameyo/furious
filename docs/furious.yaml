@@ -1,0 +1,161 @@
+openapi: "3.0.2"
+info:
+  title: Furious API
+  version: "1.0"
+  license:
+    name: MIT
+servers:
+  - url: https://furiouscinema.tk
+tags:
+  - name: movie
+    description: All about movies
+  - name: timetable
+    description: Schedule screening times and pricing for movies
+
+paths:
+  '/furious/movie/details/{movieId}':
+    get:
+      description: "Details of movie from open movie database"
+      parameters:
+        - $ref: '#/components/parameters/movieId'
+      responses:
+        '200':
+          description: Return details of movie, if no movie found can be empty
+        '400':
+          description: movieId have incorrect format
+
+  '/furious/movie/review/{movieId}':
+    post:
+      parameters:
+        - $ref: '#/components/parameters/movieId'
+      responses:
+        '201':
+          description: Create and add new review to movie reviews list
+        '400':
+          description: Review or movieId have invalid format
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/review'
+        description: "Movie review with rating and comment"
+        required: true
+    get:
+      parameters:
+        - $ref: '#/components/parameters/movieId'
+      responses:
+        '200':
+          description: "Retrieve list of all reviews for given movie"
+        '400':
+          description: "Review or movieId have invalid format"
+  '/furious/movie/reviews':
+    get:
+      responses:
+        '200':
+          description: "Retrieve list of all reviews from all movies in cinema"
+  '/furious/movie/reviews/average/{movieId}':
+    get:
+      description: "Returns average rating for this movie from moviegoers"
+      parameters:
+        - $ref: '#/components/parameters/movieId'
+      responses:
+        '200':
+          description: "Returns average rating for this movie from moviegoers"
+        '400':
+          description: "Review or movieId have invalid format"
+        '404':
+          description: "No reviews for this movie yet"
+  '/furious/timetable/{date}':
+    get:
+      description: "Timetable with staring and ending hours of screening movie along with ticket prices and theater room"
+      parameters:
+        - $ref: '#/components/parameters/date'
+      responses:
+        "200":
+          description: "Returns movie timetable (or empty if timetable for given day doesn't exist)"
+        "400":
+          description: "Date had incorrect format"
+        "404":
+          description: "There is no timetable for the given day"
+  '/furious/timetable':
+    get:
+      description: "Timetable with staring and ending hours of screening movie along with ticket prices and theater room"
+      responses:
+        "200":
+          description: "Returns movie timetable for today"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/timetable'
+        "404":
+          description: "There is not timetable for today"
+    put:
+      description: "Update timetable for a given day"
+      responses:
+        "200":
+          description: "Existing timetable was updated"
+        "201":
+          description: "New timetable was inserted for given day"
+        "400":
+          description: "Timetable have error in it's formatting"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/timetable'
+components:
+  parameters:
+    movieId:
+      name: movieId
+      in: path
+      description: "IMDB id of movie, 9 characters length"
+      required: true
+      schema:
+        type: string
+    date:
+      name: date
+      in: path
+      description: "Date in format yyyy-MM-dd"
+      required: true
+      schema:
+        type: string
+  schemas:
+    review:
+      type: object
+      properties:
+        rate:
+          type: integer
+          format: int64
+          minimum: 1
+          maximum: 5
+          description: "User rating of movie 1 to 5"
+        comment:
+          type: string
+          nullable: true
+          description: "Few words about the movie, up to 250 characters"
+    timetable:
+      type: object
+      properties:
+        date:
+          description: "Date in format yyyy-MM-dd"
+          type: string
+        timeSlots:
+          type: array
+          items:
+            $ref: '#/components/schemas/timeSlot'
+    timeSlot:
+      type: object
+      properties:
+        room:
+          description: "Cinema room number"
+          type: integer
+          format: int64
+        movieId:
+          description: "IMDB id of movie, 9 characters length"
+          type: string
+        startHour:
+          description: "Start hour of movie in 24h format HH:mm"
+          type: string
+        endHour:
+          description: "End hour of movie in 24h format HH:mm"
+          type: string

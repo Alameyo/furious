@@ -1,5 +1,7 @@
 This is API for cinema with Fast & Furious movies.  
 
+Swagger/OpenAPI documentation availvable in docs/furious.yaml
+
 Assumptions:
 * Generally API have 2 collections. Timetable and movie reviews.
 * Usually cinemas have different prices for tickets depending on time of screening, not movie title so price is part of the screening timetable. There is
