@@ -6,7 +6,6 @@ import com.alameyo.furiouscinema.inputvalidation.TimeTableValidator
 import com.alameyo.furiouscinema.repositories.TimeTableRepository
 import org.bson.Document
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.HttpStatus.NOT_FOUND
@@ -44,12 +43,12 @@ class TimeTableController : FuriousController {
     fun getTimeTable() = ResponseEntity(timeTableRepository.getTimeTable()?.let { ResponseEntity(it, OK) } ?: ResponseEntity(NOT_FOUND), OK)
 
     @PutMapping("/furious/timetable")
-    fun putTimeTable(@RequestBody body: String): HttpStatus {
-        if (validateInput(body, timeTableValidator)) return BAD_REQUEST
+    fun putTimeTable(@RequestBody body: String): ResponseEntity<Any> {
+        if (validateInput(body, timeTableValidator)) return ResponseEntity(BAD_REQUEST)
         val timeTableDocument = timeTableRepository.createTimeTableDocument(body.asJsonObject())
         return when (timeTableRepository.commitTimeTable(timeTableDocument)) {
-            true -> CREATED
-            false -> OK
+            true -> ResponseEntity(CREATED)
+            false -> ResponseEntity(OK)
         }
     }
 }

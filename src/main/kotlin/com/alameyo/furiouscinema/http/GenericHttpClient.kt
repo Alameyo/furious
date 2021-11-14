@@ -30,5 +30,10 @@ class GenericHttpClient {
         return sendRequest(httpRequest)
     }
 
+    fun httpPut(addressUri: URI, body: String): HttpResponse<String>? {
+        val httpRequest = newBuilder().uri(addressUri).PUT(ofString(body)).build()
+        return sendRequest(httpRequest)
+    }
+
     private fun sendRequest(request: HttpRequest) = httpClient.send(request, ofString())
 }

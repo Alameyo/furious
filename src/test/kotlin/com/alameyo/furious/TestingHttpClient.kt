@@ -10,4 +10,6 @@ class TestingHttpClient(private val prefix: String = "http://localhost:8080/furi
     fun get(endpoint: String) = genericHttpClient.httpGet(create("$prefix$endpoint"))
 
     fun post(endpoint: String, body: JsonObject) = genericHttpClient.httpPost(create("$prefix$endpoint"), body.toString())
+
+    fun put(endpoint: String, body: JsonObject) = genericHttpClient.httpPut(create("$prefix$endpoint"), body.toString())
 }

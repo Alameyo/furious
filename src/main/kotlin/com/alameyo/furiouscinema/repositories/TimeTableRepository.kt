@@ -43,7 +43,7 @@ class TimeTableRepository(@Autowired private val database: MongoDatabase) {
     }
 
     private fun toTimeSlotDocument(it: JsonObject) = Document().apply {
-        append("room", it["room"].asString)
+        append("room", it["room"].asInt)
         append("movieId", it["movieId"].asString)
         append("startHour", it["startHour"].asString)
         append("endHour", it["endHour"].asString)
