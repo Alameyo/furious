@@ -8,6 +8,7 @@ As preconfiguration:
   * `omdapi.token`
   * `spring.security.user.name` 
   * `spring.security.user.password`
+* Run application with `dev` profile
 
 Assumptions:
 * Generally API have 2 collections. Timetable and movie reviews.
