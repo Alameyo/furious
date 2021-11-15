@@ -2,7 +2,9 @@ package com.alameyo.furious.integration
 
 import com.alameyo.furious.TestingHttpClient
 import com.alameyo.furiouscinema.Application
+import com.alameyo.furiouscinema.JsonFields.TIME_TABLES
 import com.alameyo.furiouscinema.asJsonObject
+import com.alameyo.furiouscinema.getCollection
 import com.mongodb.client.MongoDatabase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -141,7 +143,7 @@ class TimeTableIntegrationTest(@Autowired private val database: MongoDatabase) {
 
     @AfterEach
     fun cleanUp() {
-        val timeTablesCollection = database.getCollection("timeTables")
+        val timeTablesCollection = database.getCollection(TIME_TABLES)
         timeTablesCollection.drop()
     }
 }
